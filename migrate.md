@@ -97,20 +97,20 @@
 ## 方式一：
           将数据用union进行融合
         select p.*, c.cid from (select * from lagou where district is null) p
-        join lagou_city c on c.city like concat(p.city, '%') and c.distrid is null
+       left join lagou_city c on c.city like concat(p.city, '%') and c.distrid is null
         union all
         select p.*, c.cid from (select * from lagou where district is not  null) p
-        join lagou_city c on c.city like concat(p.city, '%') and c.distrid like concat(p.district,'%')
+       left join lagou_city c on c.city like concat(p.city, '%') and c.distrid like concat(p.district,'%')
          进行根据表的数据创建
         create table lagou_position
           as
             select pid, cid as city, company_id as company, position, field, salary_min, salary_max, workyear, education, ptype, pnature, advantage, published_at, updated_at from
          (
          select p.*, c.cid from (select * from lagou where district is null) p
-         join lagou_city c on c.city like concat(p.city, '%') and c.distrid is null
+        left join lagou_city c on c.city like concat(p.city, '%') and c.distrid is null
          union all
          select p.*, c.cid from (select * from lagou where district is not  null) p
-         join lagou_city c on c.city like concat(p.city, '%') and c.distrid like concat(p.district,'%')
+       left  join lagou_city c on c.city like concat(p.city, '%') and c.distrid like concat(p.district,'%')
          )  aa;
 ## 方式二
         根据第二步或者第三步进行创建数据表
@@ -118,10 +118,10 @@
          create table lagou_position
           as select pid, cid as city, company_id as company, position, field, salary_min, salary_max, workyear, education, ptype, pnature, advantage, published_at, updated_at from
          (select p.*, c.cid from (select * from lagou where district is null) p
-         join lagou_city c on c.city like concat(p.city, '%') and c.distrid is null)s;
+        left join lagou_city c on c.city like concat(p.city, '%') and c.distrid is null)s;
         2、进行添加数据
             insert into lagou_position
             select pid, cid as city, company_id as company, position, field, salary_min, salary_max, workyear, education, ptype, pnature, advantage, published_at, updated_at from (select * from lagou where district is not  null) p
-            join lagou_city c on c.city like concat(p.city, '%') and c.distrid like concat(p.district,'%')
+           left join lagou_city c on c.city like concat(p.city, '%') and c.distrid like concat(p.district,'%')
             
             
