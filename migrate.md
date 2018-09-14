@@ -1,11 +1,11 @@
-#进行分割lagou_position表
+# 进行分割lagou_position表
         分离出 company 和 city 两张表
        -- 要求，创建三张表
        -- lagou_city (cityid, province, city, district)  # 全国的省市县信息，需要从 china_city 表中提取出来
        -- lagou_company (company_id,company_short_name,company_full_name,company_size,financestage) # 所有的公司表，从 lagou_position_bk 中分离出来
        -- lagou_position (pid, cityid, cid, position, field, salary_min, salary_max, workyear, education, ptype, pnature, advantage, published_at, updated_at)
    
-#首先进行筛选出为空的数据
+# 首先进行筛选出为空的数据
         第一步:除了distrct字段可以为空，其他字段为空的进行筛选掉
         第二步:字段不能重复，用关键字distinct进行筛选掉重复的字段值
        create table lagou as
@@ -13,13 +13,13 @@
        and salary_max is not null and workyear is not null and education is not null and ptype is not null and pnature is not null
        and advantage is not null and company_id is not null and company_short_name is not null
        and company_full_name is not null and company_size is not null and financestage is not null and position is not null;
-#在进行分割出company表
+# 在进行分割出company表
     第一步:在lagou表上进行查询出所有的公司，用group by company_id 进行筛选重复的公司
     第二步:筛选出数据后，进行把公司的相关字段进行查询company_id,company_short_name,company_full_name,company_size,financestage
     第三步:进行根据数据创建出公司表即可
     create table company as
      select company_id,company_short_name,company_full_name,company_size,financestage from  lagou group by company_id;
-#进行分割s_provinces表(地区表)
+# 进行分割s_provinces表(地区表)
     select count(*) from s_provinces;
     所有数据为:3750条
     select count(*) from s_provinces where depth=1;
@@ -81,7 +81,7 @@
              select distinct r.id cid, f.cityName province,r.cityName distrid,null from s_provinces r
              join s_provinces f on r.parentId=f.id
              where f.depth=1;
-#创建新的表，将主表的地区和公司进行分割为三张表
+# 创建新的表，将主表的地区和公司进行分割为三张表
         该表字段为pid,cid,position,field,salary_min,salary_max,workyear,education,ptype,pnature,advantage,published_at,updated_at,company_id
        第一步:查询出lagou表中district为空的字段
        select * from lagou where district is null
@@ -94,7 +94,7 @@
          select p.*, c.cid from (select * from lagou where district is not  null) p
          join lagou_city c on c.city like concat(p.city, '%') and c.distrid like concat(p.district,'%')
      第四步: 进行根据表的数据创建
-##方式一：
+## 方式一：
           将数据用union进行融合
         select p.*, c.cid from (select * from lagou where district is null) p
         join lagou_city c on c.city like concat(p.city, '%') and c.distrid is null
@@ -112,7 +112,7 @@
          select p.*, c.cid from (select * from lagou where district is not  null) p
          join lagou_city c on c.city like concat(p.city, '%') and c.distrid like concat(p.district,'%')
          )  aa;
-##方式二
+## 方式二
         根据第二步或者第三步进行创建数据表
         1、根据第二步进行创建一个数据表
          create table lagou_position
